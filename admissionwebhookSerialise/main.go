@@ -42,28 +42,32 @@ func main() {
 		panic(err.Error())
 	}
 	fmt.Printf("%s", string(data))
-	// 	inp := `metadata:
-	//   creationTimestamp: null
-	//   name: pod-validation-webhook-configration
-	// webhooks:
-	// - clientConfig:
-	//     url: https://127.0.0.1
-	//   name: pod-validation.booking-admission-controller.booking.com
-	//   rules:
-	//   - apiGroups:
-	//     - '*'
-	//     apiVersions:
-	//     - '*'
-	//     operations:
-	//     - CREATE
-	//     - UPDATE
-	//     resources:
-	// 	- pods`
+	inp := `
+webhooks:
+- name: pod-validation.booking-admission-controller.booking.com
+  clientconfig:
+    url: https://127.0.0.1
+    service: null
+    cabundle: []
+  rules:
+  - operations:
+    - CREATE
+    - UPDATE
+    rule:
+      apigroups:
+      - '*'
+      apiversions:
+      - '*'
+      resources:
+      - pods
+      scope: null
+`
 
-	// 	var config2 v1beta1.ValidatingWebhookConfiguration
+	var config2 v1beta1.ValidatingWebhookConfiguration
 
-	// 	err = yaml.Unmarshall([]byte(inp), &config2)
-	// 	if err != nil {
-	// 		panic(err.Error())
-	// 	}
+	err = yaml.Unmarshal([]byte(inp), &config2)
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Printf("%+v", config2)
 }
