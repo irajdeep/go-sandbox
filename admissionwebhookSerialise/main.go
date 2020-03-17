@@ -43,6 +43,11 @@ func main() {
 	}
 	fmt.Printf("%s", string(data))
 	inp := `
+typemeta:
+  kind: ""
+  apiversion: ""
+objectmeta:
+  name: pod-validation-webhook-configration
 webhooks:
 - name: pod-validation.booking-admission-controller.booking.com
   clientconfig:
@@ -61,7 +66,13 @@ webhooks:
       resources:
       - pods
       scope: null
-`
+  failurepolicy: null
+  matchpolicy: null
+  namespaceselector: null
+  objectselector: null
+  sideeffects: null
+  timeoutseconds: null
+  `
 
 	var config2 v1beta1.ValidatingWebhookConfiguration
 
@@ -69,5 +80,5 @@ webhooks:
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v", config2)
+	fmt.Printf("%+v", *config2.Webhooks[0].ClientConfig.URL)
 }
