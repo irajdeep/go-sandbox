@@ -1,0 +1,87 @@
+* Contexts
+
+In most scenarios where we have a web-server or a process which processes an item from workqueue, one usually calls another function
+or spins multiple go routines. Contexts is a way to terminate/control spinnned functions and go-routines. Used mostly to pass request 
+scoped values, deadlines, cacellation signals. Is used when the caller no longer needs a result from the methods, ex: user refreshes, 
+user closes connection. Ex: web search,..
+
+    * When to use them:
+        * Incoming requests to a server should create a Context.
+        * Outgoing calls to servers should accept a Context.
+        * Do not store Contexts inside a struct type; instead, pass a Context explicitly to each function that needs it.
+        * The chain of function calls between them must propagate the Context.
+        * Replace a Context using WithCancel, WithDeadline, WithTimeout, or WithValue.
+    
+    * Sources
+        *  https://blog.golang.org/context
+        *  https://talks.golang.org/2014/gotham-context.slide#1
+
+
+  
+
+* Init functions(avoid)
+
+Try to avoid init functions as much as possible. Init() functions are more like global
+declarations. They are package level and can introduce side effects when the package is imported
+Also go runtime supports no ordering of init functions
+
+```
+foo.go
+func init() {
+    doSomething("foo")
+}
+bar.go
+func init() {
+    doSomething("bar")
+}
+baz.go
+func doSomething(baz string) {
+}
+```
+prefer doing this
+
+```
+foo.go
+var (
+    _ = doSomething("foo")
+)
+bar.go
+var (
+    _ = doSomething("bar")
+)
+baz.go
+func doSomething(baz string) struct{} {
+    // Do something
+    return struct{}{}
+}
+
+```
+or if you want to initilialize package level variables before execution prefer 
+using something like this
+
+```
+var (
+    myVar = func() MyStruct {
+        m := MyStruct{}
+        // do some logic
+        return m
+    }
+)
+```
+
+* Some performance guidelines(Don't trust, always measure: write benchmark tests)
+
+    * Pre allocating slices and maps
+    * Use RLock() and not Lock() if data is used for reading purposes
+    * Use buffered I/O as much as possible : Disk operate in block of data accessig disk for every byte is inefficient
+
+
+* Interfaces
+
+
+
+
+
+** References
+
+* https://dave.cheney.net/practical-go/presentations/qcon-china.html#_guiding_principles
